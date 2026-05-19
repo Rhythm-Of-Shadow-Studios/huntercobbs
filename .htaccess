@@ -5,3 +5,9 @@
     Header set Referrer-Policy "strict-origin-when-cross-origin"
     Header set Content-Security-Policy "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://github.com https://raw.githubusercontent.com https://avatars.githubusercontent.com; connect-src 'self' https://api.github.com"
 </IfModule>
+
+# Extensionless URL for outreach links (e.g. /pinky -> /pinky.html)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^pinky/?$ /pinky.html [L]
+</IfModule>
