@@ -1,6 +1,42 @@
 /* Project Data - shared across pages */
 const projects = [
     {
+        id: "pinkylab",
+        name: "PinkyLab",
+        language: "Python",
+        description: "Fully-local multi-agent AI operations lab. One orchestrator ('Pinky') coordinates specialist agents - research, OSINT, code, critique, security, divergence, media - over llama.cpp models on a single consumer GPU. Scored 53% on GAIA Level 1 with only 2/53 true fabrications, entirely offline at $0/month marginal cost.",
+        tags: ["Python", "Multi-Agent", "LLM", "Local-First", "LangGraph", "Agentic", "GPLv3"],
+        github: "https://github.com/Rhythm-Of-Shadow-Studios/pinky_public",
+        repo: "Rhythm-Of-Shadow-Studios/pinky_public",
+        contributions: {
+            /* Estimated 2026-05-31: the public mirror ships squashed releases with no [LABEL]
+               tags, so these are heuristic counts from classifying the source commit history
+               (Co-Authored-By + commit-type signals), not exact tag counts — approximate. */
+            "CLASSIC": 41,
+            "CLASSIC-REVIEW": 77,
+            "LLM-ASSISTED": 167,
+            "LLM-ARCH": 209,
+            "LLM-REVIEW": 19,
+            "VIBE": 7
+        },
+        features: [
+            "10-agent orchestration on a single 16GB consumer GPU - one brain (gpt-oss-20b) time-shared across seven roles, co-resident with a grounding verifier",
+            "Cross-family decorrelation: critic/security on Gemma, divergence on a Llama-3.2 fork, grounding gate on Granite Guardian",
+            "Content-aware stall-cancel orchestration (async + park) replacing elapsed-clock timeouts",
+            "GAIA Level 1: 53% gold / 60% lenient / 81% no-fabrication, fully offline with no cloud or API calls"
+        ],
+        reviews: {
+            security: {
+                status: "none",
+                rounds: []
+            },
+            codeReview: {
+                status: "none",
+                rounds: []
+            }
+        }
+    },
+    {
         id: "stutter",
         name: "Stutter",
         language: "ANSI-C (C89)",
