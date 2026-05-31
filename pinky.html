@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Five-stage pipeline, nine microservice agents, three compute tiers. Built because no single model is reliably metacognitive about its own ability to answer.">
+    <meta name="description" content="A fully-local compound AI system: one orchestrator, one brain time-shared across the agent roster, beside a decorrelated grounding verifier on a single 16 GB GPU. 53% on GAIA Level 1, $0/month. Built because no single model is reliably metacognitive about its own ability to answer.">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <title>Pinky: A Compound AI System on Consumer Hardware | Hunter Cobbs</title>
@@ -27,122 +27,171 @@
             <header class="pinky-header">
                 <h1 class="pinky-title">Pinky: A Compound AI System on Consumer Hardware</h1>
                 <p class="pinky-lede">
-                    A five-stage pipeline (cache &rarr; classifier &rarr; dispatcher &rarr; specialists &rarr; verifier) running across nine microservice agents on three compute tiers. Built because no single model is reliably metacognitive about its own ability to answer.
+                    A conversational orchestrator that fans out to a roster of specialist agents over a single time-shared 20B brain &mdash; with a decorrelated grounding verifier riding co-resident on the same 16&nbsp;GB GPU. Fully local, $0/month. Built because no single model is reliably metacognitive about its own ability to answer.
                 </p>
             </header>
+
+            <section class="pinky-metrics" aria-label="Headline results">
+                <div class="metric">
+                    <span class="metric-num">53<span class="metric-unit">%</span></span>
+                    <span class="metric-label">GAIA Level&nbsp;1, gold &mdash; 28/53 exact-match</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-num">81<span class="metric-unit">%</span></span>
+                    <span class="metric-label">Answered honestly &mdash; correct or abstained, no fabrication (43/53)</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-num">2</span>
+                    <span class="metric-label">Invented facts in 53 hard questions &mdash; a 4% fabrication rate</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-num"><span class="metric-unit">$</span>0</span>
+                    <span class="metric-label">Marginal cost per month &mdash; no cloud, no API calls</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-num">16<span class="metric-unit">GB</span></span>
+                    <span class="metric-label">One consumer GPU &mdash; the whole rig, plus 29&nbsp;GB RAM</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-num">1</span>
+                    <span class="metric-label">Brain &mdash; time-shared across seven roles, beside its own verifier</span>
+                </div>
+            </section>
+            <p class="pinky-metrics-note">
+                60% lenient &middot; 5.4M tokens pushed in one benchmark run &middot; 1.35&times; memory oversubscription &middot; zero crashes, zero context overflows across 727 brain calls &middot; fully offline. &mdash; <strong>Pinky-alpha1</strong>, GAIA Level&nbsp;1, 31&nbsp;May&nbsp;2026.
+            </p>
 
             <section class="pinky-section">
                 <h2>TL;DR</h2>
                 <p>
-                    Pinky started life on April 15 as a persona chatbot in Open WebUI talking to a single 20B model via Ollama. Five weeks later it is a compound AI system in active rebuild: dispatcher, specialist ensemble, decorrelated verifier, hybrid RAG with a grounding gate. The thing that drove every architectural shift was the same lesson, learned harder each time: no single model is reliably metacognitive about its own ability to answer.
+                    Pinky started life on April&nbsp;15 as a persona chatbot in Open WebUI talking to a single 20B model through Ollama. Six weeks later it is a fully-local compound AI system that scored <strong>53% on GAIA Level&nbsp;1</strong> &mdash; one orchestrator, a roster of specialist agents, one brain time-shared across seven roles, and a decorrelated grounding verifier riding shotgun on the same GPU. Every architectural shift along the way was driven by the same lesson, learned harder each time: <strong>no single model is reliably metacognitive about its own ability to answer.</strong>
                 </p>
             </section>
 
             <section class="pinky-section">
-                <h2>How it started</h2>
-                <p>
-                    The earliest commits stood up a single 20B model behind a persona prompt, with SearXNG for web search and a vector lookup against an Obsidian vault. The "multi-agent" part was a regex-based router in a pipelines shim that pattern-matched on the user message and string-templated a delegation to another persona-flavored prompt running on the same model.
+                <h2>Six weeks, five architectures</h2>
+                <p class="pinky-subhead">
+                    Each one solved the previous version's stated problem and uncovered the next problem underneath it. This is the whole arc, in order.
                 </p>
-                <p>
-                    This was one model, one prompt, light tool use. The "agents" were system-prompt costumes the same model wore. The router was a regex, not a classifier.
-                </p>
-                <p>It worked well enough to demo. It did not work well enough to be honest.</p>
+
+                <ol class="pinky-timeline">
+                    <li class="phase">
+                        <span class="phase-eyebrow">Apr&nbsp;15</span>
+                        <h3 class="phase-title">One model in a costume</h3>
+                        <p>
+                            The earliest commits stood up a single 20B model behind a persona prompt, with SearXNG for web search and a vector lookup against an Obsidian vault. The "multi-agent" part was a regex-based router in a pipelines shim that pattern-matched the user message and string-templated a delegation to another persona-flavored prompt &mdash; running on the same model.
+                        </p>
+                        <p>
+                            One model, one prompt, light tool use. The "agents" were costumes the same model wore; the router was a regex, not a classifier. It worked well enough to demo. It did not work well enough to be honest.
+                        </p>
+                    </li>
+
+                    <li class="phase">
+                        <span class="phase-eyebrow">Phase&nbsp;1</span>
+                        <h3 class="phase-title">Real microservices</h3>
+                        <p>
+                            The persona-swap inside one model bled &mdash; Pinky would slip into another agent's voice mid-response &mdash; and the pipelines shim could not run real async loops; it was a streaming text proxy with extra steps. The move: tear out the shim and give every agent its own FastAPI&nbsp;+&nbsp;LangGraph service with its own ReAct loop, tool surface, and model assignment. Pinky became a real orchestrator with a planner LLM call instead of a regex.
+                        </p>
+                        <p>
+                            This phase ended with fourteen microservice agents, a FalkorDB knowledge graph, a Qdrant vector store, and an Obsidian-as-memory pattern with the Archivist owning every write. More correct than the regex shim &mdash; and more agents than the planner could keep straight.
+                        </p>
+                    </li>
+
+                    <li class="phase">
+                        <span class="phase-eyebrow">Phase&nbsp;2</span>
+                        <h3 class="phase-title">A designed compound system</h3>
+                        <p>
+                            This is where it stopped being "more agents" and started being a system designed around an orchestration pattern.
+                        </p>
+                        <ul>
+                            <li><strong>Fourteen agents consolidated to nine.</strong> Duplicate fan-outs collapsed into mode-switched specialists: QA and Scrum Manager merged into Critic, Code Writer and Release Manager into Developer, Tron and Rinzler into Security. The Surrealist was promoted as a deliberate source of entropy &mdash; the engine behind the Mucha-swerve. Decomposition is not a virtue when the planner cannot tell two near-duplicates apart.</li>
+                            <li><strong>The Mucha-line.</strong> The old concurrency model used an <code>is_free</code> pre-dispatch check that livelocked under fan-out. Replaced with unconditional async dispatch, a per-agent outbox, and content-aware absorb. This async core survived every later rewrite &mdash; it is still the spine of the live system.</li>
+                            <li><strong>RAG as a loop, not a tool.</strong> Section-aware chunking, a Qdrant collection with hybrid BM25-plus-vector retrieval fused by Reciprocal Rank Fusion, a <code>bge-reranker-v2-m3</code> cross-encoder, and a grounding validator that checks the answer against a different model family.</li>
+                        </ul>
+                        <p>
+                            The shape of a compound system was visible. But the orchestrator was still a "chief-of-staff": Pinky's own LLM decided when to self-handle versus dispatch, and a <code>closed_reason</code> path let it short-circuit lookups when it thought it already knew the answer. That last part is where the next failure lived.
+                        </p>
+                    </li>
+
+                    <li class="phase">
+                        <span class="phase-eyebrow">Phase&nbsp;3</span>
+                        <h3 class="phase-title">The chief-of-staff wound</h3>
+                        <p>
+                            The triggering failure was a GAIA L1 question: "What writer is quoted by Merriam-Webster on 2022-06-27?" Full-pipeline runs got it right &mdash; Annie Levin. The <code>closed_reason</code> shortcut, where Pinky's planner decided "I know this, no lookup needed," confidently fabricated Oscar Wilde. Same model, different routing decision, opposite outcome.
+                        </p>
+                        <p>That failure sat on top of weeks of failures with the same shape:</p>
+                        <ul>
+                            <li><code>closed_reason</code> hallucinations on lookup-shaped questions.</li>
+                            <li>Over-delegation: three parallel Surrealist calls for one prompt.</li>
+                            <li>Under-delegation: dropping the Developer dispatch on "make a hello-world C app."</li>
+                            <li>Four rebenches hunting for a "magic chief" model that would route correctly. None converged.</li>
+                        </ul>
+                        <p>
+                            The diagnosis, codified in ADR-002: the chief role itself is the wound.
+                        </p>
+                    </li>
+                </ol>
+
+                <blockquote class="pinky-callout">
+                    <p>No single LLM is reliably right about its own ability to answer. Swapping the chief swaps the failure mode; it does not remove it.</p>
+                    <cite>&mdash; ADR-002</cite>
+                </blockquote>
+
+                <ol class="pinky-timeline" start="5">
+                    <li class="phase">
+                        <span class="phase-eyebrow">The fork</span>
+                        <h3 class="phase-title">Staged-router: prototyped, then parked</h3>
+                        <p>
+                            ADR-002's proposed fix (18&nbsp;May) was a <em>staged-router</em>: semantic cache&nbsp;&rarr;&nbsp;tiny classifier&nbsp;&rarr;&nbsp;dispatcher&nbsp;&rarr;&nbsp;specialist ensemble&nbsp;&rarr;&nbsp;decorrelated verifier, so no single model is ever asked to be metacognitive about its own answer. I built it &mdash; all five stages as runnable code, twenty-nine integration tests green &mdash; and then never wired it in as the default path.
+                        </p>
+                        <p>
+                            Eight days later it was superseded. A working prototype lost to a better lever: a greenfield rewrite of the brain itself. The classifier alias is the only artifact that remains, sitting unused. Building it was not wasted &mdash; it proved the diagnosis. The fix that shipped kept the idea (a decorrelated verifier) and dropped the apparatus: instead of a five-stage router, one capable brain behind a hard grounding gate.
+                        </p>
+                    </li>
+
+                    <li class="phase phase-live">
+                        <span class="phase-eyebrow">Shipped</span>
+                        <h3 class="phase-title">The muchador-line</h3>
+                        <p>
+                            <strong>Pinky-alpha1</strong>, the live system, is a greenfield rewrite (the <code>muchador/</code> package) built on the surviving Mucha-line async core. One brain &mdash; <code>gpt-oss-20b</code> at Q4_K_XL &mdash; is time-shared across seven roles: planner, researcher, OSINT, developer, archivist, studio, reasoner. Three decorrelated roles (critic, security, ideaman) run on <code>Gemma-4</code> on the CPU; the Surrealist divergence engine runs on a Llama-3.2 fork.
+                        </p>
+                        <p>
+                            Every synthesized answer is gated through a <code>Granite-Guardian</code> grounding verifier riding co-resident on the same 16&nbsp;GB GPU as the brain &mdash; about 0.08&nbsp;seconds per verdict. The LiteLLM gateway that briefly sat in front of the models was ripped out; agents speak to <code>llama-server</code> directly. Orchestration is the Mucha-line: fully async, first-result-wins, with content-aware stall-cancel replacing every elapsed-clock timeout. That is the system that scored 53%.
+                        </p>
+                    </li>
+                </ol>
             </section>
 
             <section class="pinky-section">
-                <h2>Phase 1: Multi-persona chatbot to real microservices</h2>
-                <p>
-                    The persona-swap inside one model bled. Pinky would slip into another persona's voice mid-response. The pipelines shim could not run real async ReAct loops; it was a streaming text proxy with extra steps.
-                </p>
-                <p>
-                    The move was to tear out the shim and give every agent its own FastAPI plus LangGraph service with its own ReAct loop, tool surface, and model assignment. Pinky became a real orchestrator with a planner LLM call instead of a regex.
-                </p>
-                <p>
-                    This phase ended with fourteen microservice agents running, a FalkorDB knowledge graph, a Qdrant vector store, and an Obsidian-as-memory pattern where the Archivist agent owned all writes.
-                </p>
-                <p>It was more correct than the regex shim. It was also more agents than the planner could keep straight.</p>
-            </section>
+                <h2>The live architecture</h2>
+                <pre class="ascii-diagram" aria-label="Current Pinky architecture diagram"><code>USER ── Matrix / Telegram ──▶ PINKY     orchestrator — the only surface you talk to
+                                │
+                                │   plan ▸ dispatch ▸ synthesize (one voice)
+                                │   mucha-line: async · first-result-wins · stall-cancel
+                                ▼
+                        dispatch across the agent roster, grouped by backend
+                        ─────────────────────────────────────────────────────
+                        the brain, time-shared   gpt-oss-20b @ RTX 16 GB
+                          pinky · researcher · osint · developer
+                          · archivist · studio · reasoner
+                        decorrelated checks      Gemma-4 @ CPU
+                          critic · security · ideaman
+                        divergence / swerve      Llama-3.2 fork @ CPU
+                          surrealist
+                                │
+                                ▼
+                          synthesis
+                                │
+                                ▼
+                  GROUNDING GATE ── Granite-Guardian, decorrelated,
+                  co-resident with the brain on the 16 GB GPU (~0.08s/verdict)
+                                │
+                     ┌──────────┴──────────┐
+                     ▼                     ▼
+               grounded ──▶ USER     no source ──▶ escalate
 
-            <section class="pinky-section">
-                <h2>Phase 2: Microservices to a designed compound system</h2>
-                <p>
-                    This is where the architecture stopped being "more agents" and started being a system designed around an orchestration pattern. Four shifts in two weeks.
-                </p>
-                <p>
-                    <strong>Fourteen agents consolidated to nine.</strong> Duplicate fan-outs collapsed into mode-switched specialists. QA and Scrum Manager merged into Critic. Code Writer and Release Manager merged into Developer. Tron and Rinzler merged into Security. Video Editor, Audio, and Highlighter merged into Studio. The Surrealist was developed to add useful entropy &mdash; the engine behind the Mucha-swerve technique. Too many agents had been creating routing ambiguity. Decomposition is not a virtue when the planner cannot tell two near-duplicates apart.
-                </p>
-                <p>
-                    <strong>Mucha-line async redesign.</strong> The previous concurrency model used an <code>is_free</code> pre-dispatch check that livelocked under multi-agent fan-out. Replaced with unconditional dispatch, per-agent outbox, and a 180-second timeout-driven absorb. The concurrency model was not actually real until this point.
-                </p>
-                <p>
-                    <strong>Meta-router.</strong> A tiny <code>granite4:3b-h</code> JSON classifier on the iGPU emits a six-bucket intent classification in under 300 milliseconds: vault-touching, closed-reason, capability gap, clarify, trivial, multi-agent. The planner branches off the bucket instead of always running a full plan. The planner LLM had been getting called for "tell me a joke." Wasteful, and a hallucination surface. Lightweight classifier in front fixes both.
-                </p>
-                <p>
-                    <strong>RAG, properly.</strong> What had existed before was retrieval tools that an agent might or might not call. RAG is a loop, not a tool. The new implementation: section-aware chunking, Qdrant v2 collection with hybrid (BM25 plus vector) retrieval fused via Reciprocal Rank Fusion, <code>bge-reranker-v2-m3</code> cross-encoder reranking, a dedicated <code>_handle_vault_touching</code> node, and a grounding validator that checks the answering model against a different model family. Ungrounded answers had been a real failure mode; structurally eliminated.
-                </p>
-                <p>
-                    In parallel, Ollama got replaced with <code>llama-server</code> plus LiteLLM as the inference layer. Single runner family across CUDA, ROCm, and CPU. LiteLLM gateway exposes role aliases (pinky-main, osint-main, critic-main, and so on). Symlinks into the existing blob store, no re-quantization required.
-                </p>
-                <p>
-                    By the end of this phase the shape of a compound AI system was visible. The orchestrator was still a "chief-of-staff" pattern, though. Pinky's LLM decided when to self-handle versus dispatch, and a <code>closed_reason</code> path let it short-circuit lookups when it thought it already knew the answer.
-                </p>
-                <p>That last part is where the next failure lived.</p>
-            </section>
-
-            <section class="pinky-section">
-                <h2>Phase 3: The chief-of-staff wound</h2>
-                <p>
-                    The triggering failure was a GAIA L1 question: "What writer is quoted by Merriam-Webster on 2022-06-27?"
-                </p>
-                <p>
-                    Full-pipeline runs got it right. Annie Levin. The <code>closed_reason</code> shortcut, where Pinky's planner decided "I know this, no lookup needed," fabricated Oscar Wilde confidently.
-                </p>
-                <p>Same model. Different routing decision. Either correct or hallucinated.</p>
-                <p>That failure sits on top of four weeks of failures with the same shape:</p>
-                <ul>
-                    <li><code>closed_reason</code> hallucinations on lookup-shaped questions.</li>
-                    <li>Chief-of-staff over-delegation: three parallel Surrealist calls for one prompt.</li>
-                    <li>Chief-of-staff under-delegation: dropping the Developer dispatch on "make a hello world C app."</li>
-                    <li>Four rebenches across cognitive roster, meta-router, and two general re-benches. All trying to find a "magic chief" model that would route correctly. None converged.</li>
-                </ul>
-                <p>
-                    The diagnosis, codified in ADR-002: the chief role itself is the wound. No single LLM is reliably right about its own ability to answer. Swapping the chief swaps the failure mode; it does not remove it.
-                </p>
-            </section>
-
-            <section class="pinky-section">
-                <h2>The target architecture (staged-router)</h2>
-                <pre class="ascii-diagram" aria-label="Staged-router pipeline diagram"><code>user input
-  &#9474;
-  &#9660;
-STAGE 0  semantic cache (Qdrant cosine &ge; 0.95) &#9472;&#9472;hit&#9472;&#9472;&#9654; return
-  &#9474; miss
-  &#9660;
-STAGE 1  tiny classifier (granite4:3b-h, &lt; 300ms)
-         &rarr; {shape, risk, heat, confidence, budget, suggested_specialists}
-  &#9474;
-  &#9500;&#9472;&#9472; confidence high + risk low &#9472;&#9654; 1 specialist + tool prefetch
-  &#9500;&#9472;&#9472; ambiguous OR risk high    &#9472;&#9654; N-furcate: 2&#8211;3 specialists in parallel
-  &#9492;&#9472;&#9472; trivial                    &#9472;&#9654; chatty fast-path (~100ms)
-  &#9474;
-  &#9660;
-STAGE 3  specialist execution (async, speculative decoding)
-  &#9474;
-  &#9660;
-STAGE 4  decorrelated verifier (different model family from the answerer)
-         &bull; every claim has a source citation (grounding gate)
-         &bull; n-furcated answers must agree (consensus)
-         &bull; risk-gated routes need strong agreement
-         &bull; fail &rarr; escalate to bigger model or cloud burst
-  &#9474;
-  &#9660;
-STAGE 5  progressive UX: skeleton @ 300ms, draft @ first specialist, verified @ verifier-pass
-  &#9474;
-  &#9660;
-user sees</code></pre>
-                <p>
-                    Priority order codified in ADR-002: <strong>Stability &gt; Responsiveness &gt; Parallelism &gt; Accuracy</strong>. A fast wrong answer is worse than a slow correct one.
-                </p>
+  tools &amp; data ─ SearXNG search · sandboxed code-runner · Obsidian vault
+                 (Archivist-gated) · FalkorDB knowledge graph · Qdrant vectors</code></pre>
             </section>
 
             <section class="pinky-section">
@@ -158,75 +207,111 @@ user sees</code></pre>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>iGPU</td>
-                                <td>Radeon 780M, 4 GB UMA</td>
-                                <td>Stage-1 classifier only. Pinning is role assignment, not a residency trick.</td>
-                            </tr>
-                            <tr>
-                                <td>eGPU</td>
+                                <td>GPU</td>
                                 <td>RTX 5060 Ti, 16 GB</td>
-                                <td>Planner, critic, creative specialist, verifier. Migrating to TRT-LLM co-residency for true concurrent residency.</td>
+                                <td>The brain (<code>gpt-oss-20b</code>, ~11.6 GB) and the Granite-Guardian grounding verifier (~2.8 GB), co-resident. ~14.4 / 16 GB in use.</td>
                             </tr>
                             <tr>
                                 <td>CPU</td>
-                                <td>(host)</td>
-                                <td>Embeddings (nomic-embed, BGE-large), reranker (bge-reranker-v2-m3), router classifier, studio (qwen3:8b), fallback inference.</td>
+                                <td>host, 29 GB RAM</td>
+                                <td>Gemma-4 (critic / security / ideaman), the Surrealist (load-on-demand), embeddings (nomic + BGE-large), reranker (bge-reranker-v2-m3), vision (Qwen2.5-VL-3B, as-needed).</td>
+                            </tr>
+                            <tr>
+                                <td>iGPU</td>
+                                <td>Radeon 780M</td>
+                                <td>Retired. Sidelined after May 18 &mdash; wedges on vision load, GTT-only memory. The CPU tier proved more reliable.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <p>That is the whole rig. No cloud burst yet; designed in as an escalation path, not a primary.</p>
+                <p>One box. 29&nbsp;GB RAM, one 16&nbsp;GB GPU, no cloud burst. That is the whole rig.</p>
             </section>
 
             <section class="pinky-section">
                 <h2>Why compound AI, distilled</h2>
-                <p>
-                    <strong>Metacognition is the wound.</strong> A single model deciding whether it knows the answer is the failure surface every chief-of-staff pattern hits. Staging the decision across classifier &ne; answerer &ne; verifier removes the self-doubt loop.
-                </p>
-                <p>
-                    <strong>Decorrelation buys real entropy.</strong> ADR-002 makes "verifier must be a different model family from the answerer" a hard rule. Same family means same blind spots means the verifier rubber-stamps. Mistral or Gemma or Phi verify Qwen; the families are chosen for decorrelated error distributions, not for individual benchmarks.
-                </p>
-                <p>
-                    <strong>Grounding gate kills hallucination cliffs.</strong> Every <code>closed_reason</code> answer must trace a citation. No source means escalate, not ship. Eliminates the Oscar Wilde class of failure structurally.
-                </p>
-                <p>
-                    <strong>N-furcation beats model swapping.</strong> When no single model is reliably right on ambiguous or high-stakes questions, racing two or three specialists and taking consensus is cheaper than another bench cycle. Costs about 1.5 to 2 times the inference on roughly 20 percent of queries; consistently right.
-                </p>
-                <p>
-                    <strong>Compute economics on consumer hardware.</strong> The same model file serves multiple roles via system prompt, tool set, and per-request flags. Planner is reasoner with <code>enable_thinking=true</code>. Four or five model files in flight, not one per role. Critical on a 16 GB GPU.
-                </p>
-                <p>
-                    <strong>Modal expansion fits the pattern.</strong> Vision and audio specialists slot in as new worker classes. Stage 1 classifies modality, dispatcher routes. The architecture survives growth.
-                </p>
-                <p>
-                    <strong>Rejected: "just find a better chief."</strong> Four weeks of benches proved that swapping the chief swaps the failure mode rather than removing it. ADR-002 calls this out explicitly so future me does not waste a fifth week.
-                </p>
+                <div class="pinky-principles">
+                    <div class="principle">
+                        <h3>Metacognition is the wound</h3>
+                        <p>A single model deciding whether it knows the answer is the failure surface every chief-of-staff pattern hits. Staging the decision across classifier&nbsp;&ne;&nbsp;answerer&nbsp;&ne;&nbsp;verifier removes the self-doubt loop.</p>
+                    </div>
+                    <div class="principle">
+                        <h3>Decorrelation buys real entropy</h3>
+                        <p>A checker that shares the answerer's weights is theater &mdash; same priors, same blind spots. Gemma checks gpt-oss; the Surrealist swerves on a third family; the gate is a purpose-trained Guardian. Chosen for decorrelated error, not individual benchmarks.</p>
+                    </div>
+                    <div class="principle">
+                        <h3>The grounding gate kills hallucination cliffs</h3>
+                        <p>Every synthesized answer traces through Granite-Guardian; a <code>closed_reason</code> answer with no source escalates instead of shipping. This is the structural fix for the Oscar Wilde class of failure &mdash; true fabrications are now 2 in 53.</p>
+                    </div>
+                    <div class="principle">
+                        <h3>One brain, time-shared</h3>
+                        <p>Cold-swapping specialist models dominated wall-clock per question. One warm brain serving seven roles via prompt and tool set removes the swap; differentiation lives at the prompt layer, not the model layer. Critical on a 16&nbsp;GB GPU.</p>
+                    </div>
+                    <div class="principle">
+                        <h3>Stall-cancel beats the clock</h3>
+                        <p>Wallclock timeouts kill slow-but-progressing work and wait forever on wedged calls. Cancel on the absence of content progress instead; let real progress run to completion regardless of wall time.</p>
+                    </div>
+                    <div class="principle">
+                        <h3>Reasoning &gt; planning &gt; architecture</h3>
+                        <p>Understanding what is actually wanted beats clean delegation beats the delivery mechanism. A planning error re-routes; a reasoning error is confidently-executed wrongness. The architecture is scaffolding &mdash; it cannot outrank what it holds up.</p>
+                    </div>
+                    <div class="principle">
+                        <h3>Rejected: "just find a better chief"</h3>
+                        <p>Four weeks of benches proved that swapping the chief swaps the failure mode rather than removing it. ADR-002 says so explicitly, so future me does not waste a fifth week.</p>
+                    </div>
+                </div>
             </section>
 
             <section class="pinky-section">
-                <h2>What's shipped, what's in flight</h2>
-                <p>
-                    <strong>Shipped:</strong> All five stages of the staged-router pipeline as a runnable code path. Verifier is wired into the <code>_handle_closed_reason</code> path (the Oscar Wilde fix). Speculative decoding live on the CUDA router with measured results: 22 percent throughput lift, 60 percent draft acceptance. Twenty-nine integration tests green. Hybrid RAG and grounding validator live.
-                </p>
-                <p>
-                    <strong>In flight:</strong> Making <code>StagedRouterPipeline</code> the default routing path across all intents, not just <code>closed_reason</code>. Observation-mode A/B between staged and legacy. Specialist wrappers for the researcher, code, security, and agent services. TRT-LLM co-residency cutover for the eGPU tier.
-                </p>
-                <p>
-                    <strong>Not yet:</strong> Vision specialists. Audio specialists. Voice loop (VAD-CPU &rarr; ASR-eGPU &rarr; LLM-eGPU &rarr; TTS-CPU). Cloud-burst escalation.
-                </p>
+                <h2>What's shipped, parked, and next</h2>
+                <div class="pinky-status">
+                    <div class="status-col status-shipped">
+                        <h3>Shipped</h3>
+                        <ul>
+                            <li>Pinky-alpha1 at 53% GAIA L1.</li>
+                            <li>Native tool-calling across all agents.</li>
+                            <li>A blocking grounding gate (Granite-Guardian, co-resident).</li>
+                            <li>Hybrid RAG: BM25 + vector, RRF fusion, cross-encoder rerank.</li>
+                            <li>The Mucha-line: async, first-result-wins, content-aware stall-cancel.</li>
+                            <li>A durable vision-language service.</li>
+                            <li>5.4M tokens in one bench run &mdash; zero crashes, zero context overflows.</li>
+                        </ul>
+                    </div>
+                    <div class="status-col status-parked">
+                        <h3>Parked</h3>
+                        <ul>
+                            <li>The staged-router (5 stages built, 29 tests green &mdash; never the live path).</li>
+                            <li>The <code>is_free</code> concurrency model.</li>
+                            <li>The LiteLLM gateway (ripped out).</li>
+                            <li>The iGPU tier.</li>
+                            <li>Sequenced pipelines not yet ported to the Mucha-line.</li>
+                        </ul>
+                    </div>
+                    <div class="status-col status-next">
+                        <h3>Next</h3>
+                        <ul>
+                            <li>Synthesis-side answer-format extraction (~5 questions of headroom).</li>
+                            <li>A planner guardrail for temp=0 routing non-determinism.</li>
+                            <li>Porting sequenced pipelines onto park-and-resume.</li>
+                        </ul>
+                    </div>
+                </div>
             </section>
 
             <section class="pinky-section">
                 <h2>What this should tell you about how I work</h2>
                 <p>
-                    Pinky began as a persona over a single 20B model and ended up, by repeatedly losing the same fight, as a dispatcher into a specialist ensemble guarded by a decorrelated verifier. The compound AI shape is not a design preference. It is the structural answer to "no single LLM is reliably honest about what it does not know."
+                    Pinky began as a persona over a single 20B model and ended up &mdash; by repeatedly losing the same fight &mdash; as one capable brain behind a decorrelated grounding gate, fanning out across a roster of agents on a single consumer GPU. The compound shape is not a design preference. It is the structural answer to "no single LLM is reliably honest about what it does not know."
                 </p>
                 <p>
-                    The interesting part is not the architecture diagram. It is that the architecture diagram is the fourth one. Each version solved the previous version's stated problem and revealed the next problem underneath it. That is what good architecture work actually feels like.
+                    The interesting part is not the architecture diagram. It is that the diagram is the fifth one &mdash; and that one of the discarded four was a working, tested staged-router I chose not to ship. Each version solved the previous version's stated problem and revealed the next problem underneath it. A working offline benchmark beat every confident design I had. That is what good architecture work actually feels like.
                 </p>
+                <div class="pinky-links">
+                    <a class="pinky-link" href="https://github.com/Rhythm-Of-Shadow-Studios/pinky_public" rel="noopener noreferrer">Source &amp; full docs &rarr;</a>
+                    <a class="pinky-link" href="projects.html#pinkylab">Contribution breakdown &rarr;</a>
+                </div>
             </section>
 
-            <p class="pinky-footnote">Built by Hunter Cobbs. Last updated May 18, 2026.</p>
+            <p class="pinky-footnote">Built by Hunter Cobbs. Last updated May 31, 2026 &middot; Pinky-alpha1 (GAIA L1 53%).</p>
         </article>
     </main>
 
