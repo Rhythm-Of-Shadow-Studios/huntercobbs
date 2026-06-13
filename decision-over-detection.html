@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A policy-enforced, default-deny approach to defending against AI-composed attack chains. Inline allow or deny, enforced at the network, no model in the loop.">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <title>Decision Over Detection | Hunter Cobbs</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo"><img src="photos/hc.jpg" alt="HC"></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="pinky.html">Pinky</a></li>
+                <li><a href="methodology.html">Methodology</a></li>
+                <li><a href="decision-over-detection.html" class="active">Doctrine</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <article class="pinky-article container">
+            <header class="pinky-header">
+                <h1 class="pinky-title">Decision Over Detection</h1>
+                <p class="pinky-lede">
+                    Defense that resolves at the instant of the action. Inline allow or deny. Network-enforced. Default-deny. No model in the loop, no attack to recognize, nothing to be late for.
+                </p>
+            </header>
+
+            <section class="pinky-section">
+                <p>That is the whole practice. The rest of this page is what it means and why it is the only posture that survives contact with AI-grade offense.</p>
+            </section>
+
+            <section class="pinky-section">
+                <h2>The threat it answers</h2>
+                <p>Frontier AI does not bring a faster virus or a smarter phish. It brings search speed. It explores the combinatorial space of benign actions that chain into one malicious outcome, and it finds the path you never enumerated, because enumerating it was never humanly possible.</p>
+                <p>Every link in that chain scored below your remediation threshold in isolation. You scored each one correctly. The danger was never in any component. It was in the composite, and the delta between the two is invisible to every prioritization framework you own, because they all score the parts.</p>
+                <p>You cannot patch a path you cannot see, assembled by an author built to out-imagine you on purpose.</p>
+            </section>
+
+            <section class="pinky-section">
+                <h2>Why detection loses</h2>
+                <p>Detection recognizes the known. "The known" is just whatever your loop has had time to learn. A novel chain is not unknowable. It is un-learned-yet, and learning costs cycles you do not have.</p>
+                <p>Two failures that look separate are one. Performance: you cannot run inference on every packet at line rate, and the moment you sample to afford it you open the window the chain runs through. Knowledge: recognition is retrospective, and by the time your observe-learn-respond loop closes on step one, the chain is on step three.</p>
+                <p>Both are the clock. Reaction assumes prediction, and prediction against this threat is a losing game. So stop playing it.</p>
+            </section>
+
+            <section class="pinky-section">
+                <h2>The doctrine</h2>
+                <p>Stop enumerating the infinite set of bad things. Enforce the finite set your policy allows.</p>
+                <p>A decision happens inline, at the moment of the action, resolved before the action completes. It runs no inference, so the clock cannot beat it. It recognizes nothing, so novelty has nothing to defeat. The cleverest chain ever assembled still needs a path; if that path is off-policy, it is denied, and nothing ever had to identify it as an attack.</p>
+                <p>Posture does not race. It does not care what the attack is, or how fast it got there.</p>
+            </section>
+
+            <section class="pinky-section">
+                <h2>What the doctrine requires</h2>
+                <p>Four conditions. Not preferences. The argument only holds if all four are true at once.</p>
+                <ol>
+                    <li><strong>See everything.</strong> Continuous, agentless discovery and classification of every IP-connected thing the moment it touches the network. A policy with blind spots is a policy with undocumented exceptions, and the chain runs straight through the exception. Agent-based discovery disqualifies itself: it writes off exactly the unmanaged, IoT, and OT gear an attacker reaches for first.</li>
+                    <li><strong>Enforce on policy, not recognition.</strong> Enforcement triggers on "this violates policy," with zero inspection of intent. The moment a control has to identify the attack before it acts, the prediction problem is back. The attack's novelty never enters the equation.</li>
+                    <li><strong>Cover where reaction is impossible.</strong> OT, ICS, unpatchable, safety-critical. A false-positive quarantine can be more dangerous than the threat. There, default-deny is not best practice, it is the only practice, and it depends on deep visibility and behavioral baselining of devices you will never patch and cannot take down.</li>
+                    <li><strong>Enforce where every path converges.</strong> Endpoints get owned, agents get disabled, hosts get taken. The one layer every chain has to cross to matter is the network. Enforce there and you stop depending on the integrity of the thing you are trying to protect.</li>
+                </ol>
+            </section>
+
+            <section class="pinky-section">
+                <h2>Proof, not theory</h2>
+                <p>I build the offense this defends against. <strong>Pinky</strong> is a compound, multi-agent AI inference system running on a single 16GB GPU, scoring 53% on GAIA Level 1 with decorrelated verification. It is a live demonstration of the agentic capability the doctrine assumes on the other side. Builder credibility, not a position paper. <a href="pinky.html">See Pinky</a></p>
+                <p>The recovery problem behind all of this is not new to me. Two issued US patents (8,694,824 and 8,381,021) on autonomous recovery for field-deployed devices: keeping things in a known-good state without a human in the loop.</p>
+            </section>
+
+            <section class="pinky-section">
+                <h2>Who this is for</h2>
+                <p>Security leaders who already know the prevention promise is a lie and want the honest question instead: not "how do we keep them out," but "how far do they get once they're in." If you run OT, ICS, or a fleet of devices you will never patch and cannot take down, this is built for you specifically.</p>
+                <p>The attack will be novel. Your policy will not care.</p>
+                <p>Hunter</p>
+            </section>
+        </article>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2026 Hunter Cobbs | Developed with Aida</p>
+        </div>
+    </footer>
+</body>
+</html>
