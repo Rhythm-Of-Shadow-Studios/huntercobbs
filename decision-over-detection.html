@@ -53,7 +53,8 @@
             <section class="pinky-section">
                 <h2>The doctrine</h2>
                 <p>Stop enumerating the infinite set of bad things. Enforce the finite set your policy allows.</p>
-                <p>A decision happens inline, at the moment of the action, resolved before the action completes. It runs no inference, so the clock cannot beat it. It recognizes nothing, so novelty has nothing to defeat. The cleverest chain ever assembled still needs a path; if that path is off-policy, it is denied, and nothing ever had to identify it as an attack.</p>
+                <p>A decision happens inline, at the instant of the action, resolved before the action completes. It runs no inference, so the clock cannot beat it. It recognizes nothing, so novelty has nothing to defeat. The cleverest chain ever assembled still needs a path; if that path is off-policy, it is denied, and nothing ever had to identify it as an attack.</p>
+                <p>Each link can be a benign, permitted action. The path that strings them together is not. Least-privilege segmentation puts most adjacencies off-policy, so the chain dies at the first hop it was never allowed to make. You don't out-search the attacker, you shrink the board.</p>
                 <p>Posture does not race. It does not care what the attack is, or how fast it got there.</p>
             </section>
 
@@ -61,7 +62,7 @@
                 <h2>What the doctrine requires</h2>
                 <p>Four conditions. Not preferences. The argument only holds if all four are true at once.</p>
                 <ol>
-                    <li><strong>See everything.</strong> Continuous, agentless discovery and classification of every IP-connected thing as it touches the network. A policy with blind spots is a policy with undocumented exceptions, and the chain runs straight through the exception. Agent-based discovery disqualifies itself: it writes off exactly the unmanaged, IoT, and OT gear an attacker reaches for first.</li>
+                    <li><strong>See everything.</strong> Continuous, agentless discovery and classification of every IP-connected thing as it touches the network. A policy with blind spots is a policy with undocumented exceptions, and the chain walks straight through the exception. Agent-based discovery disqualifies itself: it writes off exactly the unmanaged, IoT, and OT gear an attacker reaches for first. And classifying what a device is, to set what it may touch, is not attack-recognition: you observe once to write policy, not in real time to catch the chain.</li>
                     <li><strong>Enforce on policy, not recognition.</strong> Enforcement triggers on "this violates policy," with zero inspection of intent. Once a control has to identify the attack before it acts, the prediction problem is back. The attack's novelty never enters the equation.</li>
                     <li><strong>Cover where reaction is impossible.</strong> OT, ICS, unpatchable, safety-critical. A false-positive quarantine can be more dangerous than the threat. There, default-deny is not best practice, it is the only practice, and it depends on deep visibility and behavioral baselining of devices you will never patch and cannot take down.</li>
                     <li><strong>Enforce where every path converges.</strong> Endpoints get owned, agents get disabled, hosts get taken. The one layer every chain has to cross to matter is the network. Enforce there and you stop depending on the integrity of the thing you are trying to protect.</li>
