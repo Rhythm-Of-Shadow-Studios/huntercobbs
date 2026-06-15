@@ -157,7 +157,7 @@
                             <strong>Pinky-alpha1</strong>, the live system, is a greenfield rewrite (the <code>muchador/</code> package) built on the surviving Mucha-line async core. One brain (<code>gpt-oss-20b</code> at Q4_K_XL) is time-shared across seven roles: planner, researcher, OSINT, developer, archivist, studio, reasoner. Three decorrelated roles (critic, security, ideaman) run on <code>Gemma-4</code> on the CPU; the Surrealist divergence engine runs on a Llama-3.2 fork.
                         </p>
                         <p>
-                            Every synthesized answer is gated through a <code>Granite-Guardian</code> grounding verifier riding co-resident on the same 16&nbsp;GB GPU as the brain, about 0.08&nbsp;seconds per verdict. The LiteLLM gateway that briefly sat in front of the models was ripped out; agents speak to <code>llama-server</code> directly. Orchestration is the Mucha-line: fully async, first-result-wins, with content-aware stall-cancel replacing every elapsed-clock timeout. That is the system that scored 53%.
+                            Every synthesized answer is gated through a <code>Granite-Guardian</code> grounding verifier co-resident with the brain on the same 16&nbsp;GB GPU, about 0.08&nbsp;seconds per verdict. The LiteLLM gateway that briefly sat in front of the models was ripped out; agents speak to <code>llama-server</code> directly. Orchestration is the Mucha-line: fully async, first-result-wins, with content-aware stall-cancel replacing every elapsed-clock timeout. That is the system that scored 53%.
                         </p>
                     </li>
                 </ol>
@@ -304,7 +304,7 @@
                     Pinky began as a persona over a single 20B model and ended up, by repeatedly losing the same fight, as one capable brain behind a decorrelated grounding gate, fanning out across a roster of agents on a single consumer GPU. The compound shape is not a design preference. It is the structural answer to "no single LLM is reliably honest about what it does not know."
                 </p>
                 <p>
-                    The interesting part is not the architecture diagram. It is that the diagram is the fifth one, and that one of the discarded four was a working, tested staged-router I chose not to ship. Each version solved the previous version's stated problem and revealed the next problem underneath it. A working offline benchmark beat every confident design I had. That is what good architecture work actually feels like.
+                    The interesting part is not the architecture diagram. It is that the diagram is the fifth one, and that one of the discarded four was a working, tested staged-router I chose not to ship. Every version closed the gap the last one left and opened the one beneath it. A working offline benchmark beat every confident design I had. That is what good architecture work actually feels like.
                 </p>
                 <div class="pinky-links">
                     <a class="pinky-link" href="https://github.com/Rhythm-Of-Shadow-Studios/pinky_public" rel="noopener noreferrer">Source &amp; full docs &rarr;</a>
